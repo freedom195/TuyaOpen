@@ -36,5 +36,5 @@ platforms:
 
 - name: L511C
   repo: https://github.com/freedom195/L511C
-  branch: master
-  commit: c8f61af3cbc2e59092eccc52c6c631c45789a48a
+  branch: main
+  commit: 7b88468b384c3139031e7bfff9163f1485fc5e39
