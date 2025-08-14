@@ -121,12 +121,12 @@ OPERATE_RET tuya_authorize_read(tuya_iot_license_t *license)
         PR_INFO("Authorization read succeeds.");
         return OPRT_OK;
     } else {
-        if (OPRT_OK == tuya_iot_license_read(license)) {
-            // otp read
-            PR_INFO("Authorization otp read succeeds.");
-            return OPRT_OK;
-        }
-        PR_ERR("Authorization read failure.");
+        // if (OPRT_OK == tuya_iot_license_read(license)) {
+        //     // otp read
+        //     PR_INFO("Authorization otp read succeeds.");
+        //     return OPRT_OK;
+        // }
+        // PR_ERR("Authorization read failure.");
         return OPRT_COM_ERROR;
     }
 }

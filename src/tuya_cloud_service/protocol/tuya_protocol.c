@@ -23,6 +23,7 @@
 #include "crc32i.h"
 #include "mix_method.h"
 #include "uni_random.h"
+#include <inttypes.h>
 
 /***********************************************************
 *************************micro define***********************
@@ -236,8 +237,7 @@ static OPERATE_RET __pack_data_with_cmd_pv23(const DP_CMD_TYPE_E cmd, const char
 
     // offset += sprintf(out + offset, "{\"protocol\":%d,\"t\":%d,\"data\":%s", pro, (uint32_t)tal_time_get_posix(),
     // src);
-    offset += sprintf(out + offset, "{\"protocol\":%" PRIu32 ",\"t\":%" PRIu32 ",\"data\":%s", pro,
-                      (uint32_t)tal_time_get_posix(), src);
+    offset += sprintf(out + offset, "{\"protocol\":%" PRIu32 ",\"t\":%" PRIu32 ",\"data\":%s", pro, (uint32_t)tal_time_get_posix(), src);
 
     out[offset++] = '}';
     out[offset] = 0;

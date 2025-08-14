@@ -20,53 +20,54 @@
  *
  */
 #include "tal_fs.h"
-#include "lfs.h"
+#include "tkl_fs.h"
+// #include "lfs.h"
 #include "tal_api.h"
 
 int __lfs_get_cfg(const char *mode)
 {
     int flag = 0;
 
-    // Iterate through the mode string and set the corresponding bit mask
-    for (const char *p = mode; *p != '\0'; ++p) {
-        switch (*p) {
-        case 'r':
-            if (*(p + 1) == '+') {
-                flag |= LFS_O_RDWR;
-                ++p; // Skip '+'
-            } else {
-                flag |= LFS_O_RDONLY;
-            }
-            break;
-#ifndef LFS_READONLY
-        case 'w':
-            if (*(p + 1) == '+') {
-                flag |= LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC;
-                ++p; // Skip '+'
-            } else {
-                flag |= LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC;
-            }
-            break;
-        case 'a':
-            if (*(p + 1) == '+') {
-                flag |= LFS_O_RDWR | LFS_O_CREAT | LFS_O_APPEND;
-                ++p; // Skip '+'
-            } else {
-                flag |= LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND;
-            }
-            break;
-        case 'x':
-            flag |= LFS_O_EXCL;
-            break;
-        case 't':
-            flag |= LFS_O_TRUNC;
-            break;
-#endif
-        default:
-            // Ignore other characters
-            break;
-        }
-    }
+//     // Iterate through the mode string and set the corresponding bit mask
+//     for (const char *p = mode; *p != '\0'; ++p) {
+//         switch (*p) {
+//         case 'r':
+//             if (*(p + 1) == '+') {
+//                 flag |= LFS_O_RDWR;
+//                 ++p; // Skip '+'
+//             } else {
+//                 flag |= LFS_O_RDONLY;
+//             }
+//             break;
+// #ifndef LFS_READONLY
+//         case 'w':
+//             if (*(p + 1) == '+') {
+//                 flag |= LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC;
+//                 ++p; // Skip '+'
+//             } else {
+//                 flag |= LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC;
+//             }
+//             break;
+//         case 'a':
+//             if (*(p + 1) == '+') {
+//                 flag |= LFS_O_RDWR | LFS_O_CREAT | LFS_O_APPEND;
+//                 ++p; // Skip '+'
+//             } else {
+//                 flag |= LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND;
+//             }
+//             break;
+//         case 'x':
+//             flag |= LFS_O_EXCL;
+//             break;
+//         case 't':
+//             flag |= LFS_O_TRUNC;
+//             break;
+// #endif
+//         default:
+//             // Ignore other characters
+//             break;
+//         }
+//     }
 
     return flag;
 }
@@ -82,7 +83,11 @@ int __lfs_get_cfg(const char *mode)
  */
 int tal_fs_mkdir(const char *path)
 {
+#if 0
     return lfs_mkdir(tal_lfs_get(), path);
+#else
+    return tkl_fs_mkdir(path);
+#endif 
 }
 
 /**
@@ -96,7 +101,8 @@ int tal_fs_mkdir(const char *path)
  */
 int tal_fs_remove(const char *path)
 {
-    return lfs_remove(tal_lfs_get(), path);
+    // return lfs_remove(tal_lfs_get(), path);
+    return tkl_fs_remove(path);
 }
 
 /**
@@ -126,10 +132,10 @@ int tal_fs_mode(const char *path, unsigned int *mode)
  */
 int tal_fs_is_exist(const char *path, BOOL_T *is_exist)
 {
-    struct lfs_info info;
-    int rt = lfs_stat(tal_lfs_get(), path, &info);
-    *is_exist = (rt < 0) ? 0 : 1;
-    return OPRT_OK;
+    // struct lfs_info info;
+    // int rt = lfs_stat(tal_lfs_get(), path, &info);
+    // *is_exist = (rt < 0) ? 0 : 1;
+    return tkl_fs_is_exist(path, is_exist);
 }
 
 /**
@@ -144,7 +150,8 @@ int tal_fs_is_exist(const char *path, BOOL_T *is_exist)
  */
 int tal_fs_rename(const char *path_old, const char *path_new)
 {
-    return lfs_rename(tal_lfs_get(), path_old, path_new);
+    return tkl_fs_rename(path_old, path_new);
+    // return lfs_rename(tal_lfs_get(), path_old, path_new);
 }
 
 /**
@@ -159,17 +166,17 @@ int tal_fs_rename(const char *path_old, const char *path_new)
  */
 int tal_dir_open(const char *path, TUYA_DIR *dir)
 {
-    lfs_dir_t *d = tal_malloc(sizeof(lfs_dir_t));
-    if (!d)
-        return OPRT_MALLOC_FAILED;
+    // lfs_dir_t *d = tal_malloc(sizeof(lfs_dir_t));
+    // if (!d)
+    //     return OPRT_MALLOC_FAILED;
 
-    if (0 != lfs_dir_open(tal_lfs_get(), d, path)) {
-        tal_free(d);
-        return OPRT_DIR_OPEN_FAILED;
-    }
+    // if (0 != lfs_dir_open(tal_lfs_get(), d, path)) {
+    //     tal_free(d);
+    //     return OPRT_DIR_OPEN_FAILED;
+    // }
 
-    *dir = d;
-    return OPRT_OK;
+    // *dir = d;
+    return tkl_dir_open(path, dir);
 }
 
 /**
@@ -183,14 +190,13 @@ int tal_dir_open(const char *path, TUYA_DIR *dir)
  */
 int tal_dir_close(TUYA_DIR dir)
 {
-    if (NULL == dir)
-        return OPRT_OK;
+    // if (NULL == dir)
+    //     return OPRT_OK;
 
-    lfs_dir_close(tal_lfs_get(), dir);
-    tal_free(dir);
-    dir = NULL;
-
-    return OPRT_OK;
+    // lfs_dir_close(tal_lfs_get(), dir);
+    // tal_free(dir);
+    // dir = NULL;
+    return tkl_dir_close(dir);
 }
 
 /**
@@ -208,17 +214,17 @@ int tal_dir_close(TUYA_DIR dir)
  */
 int tal_dir_read(TUYA_DIR dir, TUYA_FILEINFO *info)
 {
-    struct lfs_info *dir_info = tal_malloc(sizeof(struct lfs_info));
-    if (!dir_info)
-        return OPRT_MALLOC_FAILED;
+    // struct lfs_info *dir_info = tal_malloc(sizeof(struct lfs_info));
+    // if (!dir_info)
+    //     return OPRT_MALLOC_FAILED;
 
-    int rt = lfs_dir_read(tal_lfs_get(), dir, dir_info);
-    if (rt <= 0) {
-        return rt == 0 ? OPRT_EOD : OPRT_DIR_READ_FAILED;
-    }
+    // int rt = lfs_dir_read(tal_lfs_get(), dir, dir_info);
+    // if (rt <= 0) {
+    //     return rt == 0 ? OPRT_EOD : OPRT_DIR_READ_FAILED;
+    // }
 
-    *info = dir_info;
-    return OPRT_OK;
+    // *info = dir_info;
+    return tkl_dir_read(dir, info);
 }
 
 /**
@@ -233,13 +239,13 @@ int tal_dir_read(TUYA_DIR dir, TUYA_FILEINFO *info)
  */
 int tal_dir_name(TUYA_FILEINFO info, const char **name)
 {
-    if (NULL == info) {
-        return OPRT_INVALID_PARM;
-    }
+    // if (NULL == info) {
+    //     return OPRT_INVALID_PARM;
+    // }
 
-    struct lfs_info *dir_info = (struct lfs_info *)info;
-    *name = dir_info->name;
-    return OPRT_OK;
+    // struct lfs_info *dir_info = (struct lfs_info *)info;
+    // *name = dir_info->name;
+    return tkl_dir_name(info, name);
 }
 
 /**
@@ -254,13 +260,13 @@ int tal_dir_name(TUYA_FILEINFO info, const char **name)
  */
 int tal_dir_is_directory(TUYA_FILEINFO info, BOOL_T *is_dir)
 {
-    if (NULL == info) {
-        return OPRT_INVALID_PARM;
-    }
+    // if (NULL == info) {
+    //     return OPRT_INVALID_PARM;
+    // }
 
-    struct lfs_info *dir_info = (struct lfs_info *)info;
-    *is_dir = (dir_info->type == LFS_TYPE_DIR) ? 1 : 0;
-    return OPRT_OK;
+    // struct lfs_info *dir_info = (struct lfs_info *)info;
+    // *is_dir = (dir_info->type == LFS_TYPE_DIR) ? 1 : 0;
+    return tkl_dir_is_directory(info, is_dir);
 }
 
 /**
@@ -276,13 +282,13 @@ int tal_dir_is_directory(TUYA_FILEINFO info, BOOL_T *is_dir)
 
 int tal_dir_is_regular(TUYA_FILEINFO info, BOOL_T *is_regular)
 {
-    if (NULL == info) {
-        return OPRT_INVALID_PARM;
-    }
+    // if (NULL == info) {
+    //     return OPRT_INVALID_PARM;
+    // }
 
-    struct lfs_info *dir_info = (struct lfs_info *)info;
-    *is_regular = (dir_info->type == LFS_TYPE_REG) ? 1 : 0;
-    return OPRT_OK;
+    // struct lfs_info *dir_info = (struct lfs_info *)info;
+    // *is_regular = (dir_info->type == LFS_TYPE_REG) ? 1 : 0;
+    return tkl_dir_is_regular(info, is_regular);
 }
 
 /**
@@ -297,17 +303,19 @@ int tal_dir_is_regular(TUYA_FILEINFO info, BOOL_T *is_regular)
  */
 TUYA_FILE tal_fopen(const char *path, const char *mode)
 {
-    lfs_file_t *f = tal_malloc(sizeof(lfs_file_t));
-    if (!f)
-        return NULL;
+    // lfs_file_t *f = tal_malloc(sizeof(lfs_file_t));
+    // if (!f)
+    //     return NULL;
 
-    memset(f, 0, sizeof(lfs_file_t));
-    if (0 != lfs_file_open(tal_lfs_get(), f, path, __lfs_get_cfg(mode))) {
-        tal_free(f);
-        return NULL;
-    }
+    // memset(f, 0, sizeof(lfs_file_t));
+    // if (0 != lfs_file_open(tal_lfs_get(), f, path, __lfs_get_cfg(mode))) {
+    //     tal_free(f);
+        // return NULL;
+    // }
 
-    return f;
+    // return f;
+
+    return tkl_fopen(path, mode);
 }
 
 /**
@@ -321,13 +329,13 @@ TUYA_FILE tal_fopen(const char *path, const char *mode)
  */
 int tal_fclose(TUYA_FILE file)
 {
-    if (NULL == file)
-        return OPRT_OK;
+    // if (NULL == file)
+    //     return OPRT_OK;
 
-    lfs_file_close(tal_lfs_get(), (lfs_file_t *)file);
-    tal_free(file);
-    file = NULL;
-    return OPRT_OK;
+    // lfs_file_close(tal_lfs_get(), (lfs_file_t *)file);
+    // tal_free(file);
+    // file = NULL;
+    return tkl_fclose(file);
 }
 
 /**
@@ -343,7 +351,8 @@ int tal_fclose(TUYA_FILE file)
  */
 int tal_fread(void *buf, int bytes, TUYA_FILE file)
 {
-    return lfs_file_read(tal_lfs_get(), (lfs_file_t *)file, buf, bytes);
+    // return lfs_file_read(tal_lfs_get(), (lfs_file_t *)file, buf, bytes);
+    return tkl_fread(buf, bytes, file);
 }
 
 /**
@@ -359,7 +368,8 @@ int tal_fread(void *buf, int bytes, TUYA_FILE file)
  */
 int tal_fwrite(void *buf, int bytes, TUYA_FILE file)
 {
-    return lfs_file_write(tal_lfs_get(), (lfs_file_t *)file, buf, bytes);
+    // return lfs_file_write(tal_lfs_get(), (lfs_file_t *)file, buf, bytes);
+    return tkl_fwrite(buf, bytes, file);
 }
 
 /**
@@ -373,7 +383,8 @@ int tal_fwrite(void *buf, int bytes, TUYA_FILE file)
  */
 int tal_fsync(TUYA_FILE file)
 {
-    return lfs_file_sync(tal_lfs_get(), (lfs_file_t *)file);
+    // return lfs_file_sync(tal_lfs_get(), (lfs_file_t *)file);
+    return tkl_fsync((int)file);
 }
 
 /**
@@ -389,28 +400,29 @@ int tal_fsync(TUYA_FILE file)
  */
 char *tal_fgets(char *buf, int len, TUYA_FILE file)
 {
-    int i = 0;
-    char c;
-    while (i < len - 1) {
-        int rt = lfs_file_read(tal_lfs_get(), file, &c, 1);
-        if (rt < 0) {
-            return NULL;
-        } else if (rt == 0) {
-            break;
-        } else {
-            buf[i++] = c;
-            if (c == '\n') {
-                break;
-            }
-        }
-    }
+    // int i = 0;
+    // char c;
+    // while (i < len - 1) {
+    //     int rt = lfs_file_read(tal_lfs_get(), file, &c, 1);
+    //     if (rt < 0) {
+    //         return NULL;
+    //     } else if (rt == 0) {
+    //         break;
+    //     } else {
+    //         buf[i++] = c;
+    //         if (c == '\n') {
+    //             break;
+    //         }
+    //     }
+    // }
 
-    buf[i] = '\0';
-    if (i == 0 && c != '\n') {
-        return NULL;
-    }
+    // buf[i] = '\0';
+    // if (i == 0 && c != '\n') {
+        // return NULL;
+    // }
 
-    return buf;
+    // return buf;
+    return tkl_fgets(buf, len, file);
 }
 
 /**
@@ -424,13 +436,14 @@ char *tal_fgets(char *buf, int len, TUYA_FILE file)
  */
 int tal_feof(TUYA_FILE file)
 {
-    char ch;
-    if (0 == lfs_file_read(tal_lfs_get(), (lfs_file_t *)file, &ch, 1))
-        return 1;
+    // char ch;
+    // if (0 == lfs_file_read(tal_lfs_get(), (lfs_file_t *)file, &ch, 1))
+    //     return 1;
 
-    // if not EOF, need seek back (read will change the offset)
-    lfs_file_seek(tal_lfs_get(), (lfs_file_t *)file, -1, LFS_SEEK_CUR);
-    return 0;
+    // // if not EOF, need seek back (read will change the offset)
+    // lfs_file_seek(tal_lfs_get(), (lfs_file_t *)file, -1, LFS_SEEK_CUR);
+    // return 0;
+    return tkl_feof(file);
 }
 
 /**
@@ -446,7 +459,8 @@ int tal_feof(TUYA_FILE file)
  */
 int tal_fseek(TUYA_FILE file, int64_t offs, int whence)
 {
-    return lfs_file_seek(tal_lfs_get(), (lfs_file_t *)file, offs, whence);
+    // return lfs_file_seek(tal_lfs_get(), (lfs_file_t *)file, offs, whence);
+    return tkl_fseek(file, offs, whence);
 }
 
 /**
@@ -460,7 +474,8 @@ int tal_fseek(TUYA_FILE file, int64_t offs, int whence)
  */
 int64_t tal_ftell(TUYA_FILE file)
 {
-    return lfs_file_tell(tal_lfs_get(), (lfs_file_t *)file);
+    // return lfs_file_tell(tal_lfs_get(), (lfs_file_t *)file);
+    return tkl_ftell(file);
 }
 
 /**
@@ -474,13 +489,14 @@ int64_t tal_ftell(TUYA_FILE file)
  */
 int tal_fgetsize(const char *filepath)
 {
-    struct lfs_info info;
-    int err = lfs_stat(tal_lfs_get(), filepath, &info);
-    if (err < 0) {
-        return 0;
-    }
+    // struct lfs_info info;
+    // int err = lfs_stat(tal_lfs_get(), filepath, &info);
+    // if (err < 0) {
+    //     return 0;
+    // }
 
-    return (info.type == LFS_TYPE_REG) ? info.size : -1;
+    // return (info.type == LFS_TYPE_REG) ? info.size : -1;
+    return tkl_fgetsize(filepath);
 }
 
 /**
@@ -510,10 +526,11 @@ int tal_faccess(const char *filepath, int mode)
  */
 int tal_fgetc(TUYA_FILE file)
 {
-    char ch;
-    if (0 == lfs_file_read(tal_lfs_get(), (lfs_file_t *)file, &ch, 1))
-        ch = EOF;
-    return ch;
+    // char ch;
+    // if (0 == lfs_file_read(tal_lfs_get(), (lfs_file_t *)file, &ch, 1))
+        // ch = EOF;
+    // return ch;
+    return fgetc(file);
 }
 
 /**
@@ -527,7 +544,8 @@ int tal_fgetc(TUYA_FILE file)
  */
 int tal_fflush(TUYA_FILE file)
 {
-    return lfs_file_sync(tal_lfs_get(), (lfs_file_t *)file);
+    // return lfs_file_sync(tal_lfs_get(), (lfs_file_t *)file);
+    return tkl_fflush(file);
 }
 
 /**
@@ -557,5 +575,6 @@ int tal_fileno(TUYA_FILE file)
  */
 int tal_ftruncate(int fd, uint64_t length)
 {
-    return OPRT_NOT_SUPPORTED;
+    // return OPRT_NOT_SUPPORTED;
+    return tkl_ftruncate(fd, length);
 }

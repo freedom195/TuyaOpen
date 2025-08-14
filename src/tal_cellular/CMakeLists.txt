@@ -4,8 +4,6 @@
 #/
 
 # MODULE_PATH
-# if (CONFIG_ENABLE_WIRED STREQUAL "y")
-
 set(MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 # MODULE_NAME
@@ -16,6 +14,7 @@ aux_source_directory(${MODULE_PATH}/src LIB_SRCS)
 
 # LIB_PUBLIC_INC
 set(LIB_PUBLIC_INC ${MODULE_PATH}/include)
+
 
 ########################################
 # Target Configure
@@ -43,5 +42,3 @@ list(APPEND COMPONENT_LIBS ${MODULE_NAME})
 set(COMPONENT_LIBS "${COMPONENT_LIBS}" PARENT_SCOPE)
 list(APPEND COMPONENT_PUBINC ${LIB_PUBLIC_INC})
 set(COMPONENT_PUBINC "${COMPONENT_PUBINC}" PARENT_SCOPE)
-
-# endif()

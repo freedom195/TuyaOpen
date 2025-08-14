@@ -104,6 +104,7 @@ void user_event_handler_on(tuya_iot_client_t *client, tuya_event_msg_t *event)
 #if defined(ENABLE_QRCODE) && (ENABLE_QRCODE == 1)
         char buffer[255];
         sprintf(buffer, "https://smartapp.tuya.com/s/p?p=%s&uuid=%s&v=2.0", TUYA_PRODUCT_ID, license.uuid);
+        PR_INFO("QRCode: %s", buffer);
         qrcode_string_output(buffer, user_log_output_cb, 0);
 #endif
     } break;
@@ -217,8 +218,9 @@ void user_main(void)
 
     //! open iot development kit runtim init
     cJSON_InitHooks(&(cJSON_Hooks){.malloc_fn = tal_malloc, .free_fn = tal_free});
+    tal_time_service_init();
     tal_log_init(TAL_LOG_LEVEL_DEBUG, 1024, (TAL_LOG_OUTPUT_CB)tkl_log_output);
-
+    tal_log_color_enable_set(false);
     PR_NOTICE("Application information:");
     PR_NOTICE("Project name:        %s", PROJECT_NAME);
     PR_NOTICE("App version:         %s", PROJECT_VERSION);
